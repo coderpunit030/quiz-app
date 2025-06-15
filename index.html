@@ -17,8 +17,15 @@
   <h1>📘 QuickQuiz</h1>
   <h2 id="quizTitle">Java Basics Quiz</h2>
 
+  <!-- Student Info Form -->
+  <div id="student-info">
+    <input id="studentName" placeholder="Enter your name" required><br>
+    <input id="studentAge" type="number" placeholder="Enter your age" required><br>
+    <button onclick="startQuiz()">Start Quiz 🚀</button>
+  </div>
+
   <!-- Quiz Section -->
-  <div id="quiz-section">
+  <div id="quiz-section" class="hidden">
     <div id="question-box"></div>
     <button onclick="prevQuestion()">⏮️ Previous</button>
     <button onclick="nextQuestion()">⏭️ Next</button>
@@ -28,7 +35,6 @@
   <!-- Result Section -->
   <div id="result-section" class="hidden">
     <h3>Your Score: <span id="scoreDisplay"></span></h3>
-    <input id="userName" placeholder="Enter your name">
     <button onclick="saveScore()">💾 Save Score</button>
     <button onclick="restartQuiz()">🔁 Start Again</button>
   </div>
@@ -62,6 +68,7 @@
 
     let userAnswers = Array(quizData.length).fill(null);
     let current = 0;
+    let student = { name: "", age: 0 };
 
     function showQuestion() {
       const q = quizData[current];
@@ -109,11 +116,8 @@
     }
 
     function saveScore() {
-      const name = document.getElementById("userName").value.trim();
-      if (!name) return alert("Please enter your name.");
-
       const board = JSON.parse(localStorage.getItem("leaderboard") || "[]");
-      board.push({ name, score: window.finalScore });
+      board.push({ name: student.name, age: student.age, score: window.finalScore });
       board.sort((a, b) => b.score - a.score);
       localStorage.setItem("leaderboard", JSON.stringify(board));
       displayLeaderboard();
@@ -123,7 +127,7 @@
     function displayLeaderboard() {
       const board = JSON.parse(localStorage.getItem("leaderboard") || "[]");
       document.getElementById("leaderboardList").innerHTML = 
-        board.map(e => `<li>${e.name} - ${e.score}</li>`).join('');
+        board.map(e => `<li>${e.name} (Age ${e.age}) - ${e.score}</li>`).join('');
     }
 
     function clearLeaderboard() {
@@ -136,13 +140,26 @@
     function restartQuiz() {
       userAnswers = Array(quizData.length).fill(null);
       current = 0;
+      student = { name: "", age: 0 };
       document.getElementById("result-section").classList.add("hidden");
+      document.getElementById("student-info").classList.remove("hidden");
+    }
+
+    function startQuiz() {
+      const name = document.getElementById("studentName").value.trim();
+      const age = parseInt(document.getElementById("studentAge").value.trim());
+      if (!name || isNaN(age)) {
+        alert("Please enter your name and age.");
+        return;
+      }
+      student.name = name;
+      student.age = age;
+      document.getElementById("student-info").classList.add("hidden");
       document.getElementById("quiz-section").classList.remove("hidden");
       showQuestion();
     }
 
     // Init
-    showQuestion();
     displayLeaderboard();
   </script>
 
