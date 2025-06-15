@@ -16,7 +16,7 @@
 <button onclick="toggleLanguage()">🌐 Switch to Hindi</button>
 
   <h1>📘 QuickQuiz</h1>
-  <h2 id="quizTitle">Java Basics Quiz</h2>
+  <h2 id="quizTitle">HARYANA CET</h2>
 
   <!-- Student Info Form -->
   <div id="student-info">
@@ -48,7 +48,7 @@
   </div>
 
   <script>
-    let language = 'en'; // default English
+    let language = 'English'; // default English
 
     // ✅ Hardcoded Quiz Data
     const quizData = [
@@ -162,10 +162,13 @@
       showQuestion();
     }
     function toggleLanguage() {
-  language = language === 'en' ? 'hi' : 'en';
+  language = language === 'English' ? 'Hindi' : 'English';
   document.querySelector("button[onclick='toggleLanguage()']").textContent =
-    language === 'en' ? "🌐 Switch to Hindi" : "🌐 अंग्रेज़ी में बदलें";
-  showQuestion();
+    language === 'English' ? "🌐 Switch to Hindi" : "🌐 अंग्रेज़ी में बदलें";
+  // showQuestion();
+      if (!document.getElementById("quiz-section").classList.contains("hidden")) {
+    showQuestion();
+      }
 }
 
 
