@@ -13,6 +13,7 @@
   </style>
 </head>
 <body>
+<button onclick="toggleLanguage()">🌐 Switch to Hindi</button>
 
   <h1>📘 QuickQuiz</h1>
   <h2 id="quizTitle">Java Basics Quiz</h2>
@@ -47,39 +48,38 @@
   </div>
 
   <script>
+    let language = 'en'; // default English
+
     // ✅ Hardcoded Quiz Data
     const quizData = [
-      {
-        question: "What is the size of int in Java?",
-        options: ["2 bytes", "4 bytes", "8 bytes", "Depends on system"],
-        correct: "4 bytes"
-      },
-      {
-        question: "Which method is the entry point in a Java program?",
-        options: ["start()", "main()", "init()", "run()"],
-        correct: "main()"
-      },
-      {
-        question: "Which keyword is used to inherit a class in Java?",
-        options: ["this", "extends", "implements", "inherits"],
-        correct: "extends"
-      }
+     {
+    English: {
+      question: "Who was the first Chief Minister of Haryana?",
+      options: ["Bansi Lal", "Bhagwat Dayal Sharma", "Devi Lal", "Om Prakash Chautala"],
+      correct: "Bhagwat Dayal Sharma"
+    },
+    Hindi: {
+      question: "हरियाणा के पहले मुख्यमंत्री कौन थे?",
+      options: ["बंसी लाल", "भगवत दयाल शर्मा", "देवी लाल", "ओम प्रकाश चौटाला"],
+      correct: "भगवत दयाल शर्मा"
+    }
     ];
 
     let userAnswers = Array(quizData.length).fill(null);
     let current = 0;
     let student = { name: "", age: 0 };
 
-    function showQuestion() {
-      const q = quizData[current];
-      document.getElementById("question-box").innerHTML = `
-        <div class="question">Q${current+1}: ${q.question}</div>
-        ${q.options.map(opt => `
-          <label><input type="radio" name="answer" value="${opt}" 
-            ${userAnswers[current] === opt ? "checked" : ""}> ${opt}</label><br>
-        `).join('')}
-      `;
-    }
+   function showQuestion() {
+  const q = quizData[current][language];
+  document.getElementById("question-box").innerHTML = `
+    <div class="question">Q${current+1}: ${q.question}</div>
+    ${q.options.map(opt => `
+      <label><input type="radio" name="answer" value="${opt}" 
+        ${userAnswers[current] === opt ? "checked" : ""}> ${opt}</label><br>
+    `).join('')}
+  `;
+}
+
 
     function saveAnswer() {
       const selected = document.querySelector('input[name="answer"]:checked');
@@ -158,6 +158,13 @@
       document.getElementById("quiz-section").classList.remove("hidden");
       showQuestion();
     }
+    function toggleLanguage() {
+  language = language === 'en' ? 'hi' : 'en';
+  document.querySelector("button[onclick='toggleLanguage()']").textContent =
+    language === 'en' ? "🌐 Switch to Hindi" : "🌐 अंग्रेज़ी में बदलें";
+  showQuestion();
+}
+
 
     // Init
     displayLeaderboard();
