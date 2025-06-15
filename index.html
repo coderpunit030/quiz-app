@@ -1,111 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>QuickQuiz</title>
   <style>
-    body{
-      color: white;
-      background-color: rgb(41, 39, 39);
-    }
-    body { font-family: Arial; max-width: 800px; margin: auto; padding: 20px; }
-    textarea {background: #212020; color: aliceblue; width: 100%; height: 100px; }
-    input, button {background: #212020; color: aliceblue; padding: 8px; margin: 5px; }
+    body { font-family: Arial, sans-serif; max-width: 700px; margin: auto; padding: 20px; }
+    button, input { padding: 8px; margin: 5px 0; }
+    .question { font-weight: bold; margin-top: 20px; }
     .hidden { display: none; }
-    .question-box { margin: 20px 0; }
-    .question { font-weight: bold; }
     ol { padding-left: 20px; }
   </style>
 </head>
 <body>
 
-  <h1>QuickQuiz Builder & Player</h1>
-
-  <!-- Admin Section -->
-  <div id="admin-section">
-    <h3>🛠️ Add Questions</h3>
-    <input id="quiz-title" placeholder="Enter Quiz Title"><br>
-    <textarea id="question-text" placeholder="Enter your question here"></textarea><br>
-    <input id="opt1" placeholder="Option 1">
-    <input id="opt2" placeholder="Option 2">
-    <input id="opt3" placeholder="Option 3">
-    <input id="opt4" placeholder="Option 4"><br>
-    <input id="correct-answer" placeholder='Enter correct option exactly (e.g., "Option 2")'><br>
-    <button onclick="addQuestion()">Add Question</button>
-    <button onclick="startQuiz()">Start Quiz</button>
-    <p id="q-status"></p>
-    <hr>
-  </div>
+  <h1>📘 QuickQuiz</h1>
+  <h2 id="quizTitle">Java Basics Quiz</h2>
 
   <!-- Quiz Section -->
-  <div id="quiz-section" class="hidden">
-    <h2 id="quizTitle"></h2>
+  <div id="quiz-section">
     <div id="question-box"></div>
-    <button onclick="prevQuestion()">Previous</button>
-    <button onclick="nextQuestion()">Next</button>
-    <button onclick="submitQuiz()">Submit</button>
+    <button onclick="prevQuestion()">⏮️ Previous</button>
+    <button onclick="nextQuestion()">⏭️ Next</button>
+    <button onclick="submitQuiz()">✅ Submit</button>
   </div>
 
   <!-- Result Section -->
   <div id="result-section" class="hidden">
-    <h3>Your Score: <span id="scoreDisplay"></span></h3>
+    <h3>Your Score: <span id="scoreDisplay"></span></h3>
     <input id="userName" placeholder="Enter your name">
-    <button onclick="saveScore()">Save Score</button>
-    <div id="restartArea"></div>
+    <button onclick="saveScore()">💾 Save Score</button>
+    <button onclick="restartQuiz()">🔁 Start Again</button>
   </div>
 
-  <!-- Scoreboard -->
-  <div id="scoreboard">
-    <h3>🏆 Leaderboard</h3>
+  <!-- Leaderboard Section -->
+  <div>
+    <h3>🏆 Leaderboard</h3>
     <ol id="leaderboardList"></ol>
-    <button onclick="clearLeaderboard()">🗑️ Clear Leaderboard</button>
+    <button onclick="clearLeaderboard()">🗑️ Clear Leaderboard</button>
   </div>
-
-  <button onclick="copyLink()">🔗 Share Link</button>
-  <p id="shareStatus"></p>
 
   <script>
-    let quizData = [], userAnswers = [], current = 0, quizTitle = '';
-
-    /* ---------- Question Builder ---------- */
-    function addQuestion() {
-      const q  = document.getElementById("question-text").value.trim(),
-            o1 = document.getElementById("opt1").value.trim(),
-            o2 = document.getElementById("opt2").value.trim(),
-            o3 = document.getElementById("opt3").value.trim(),
-            o4 = document.getElementById("opt4").value.trim(),
-            correct = document.getElementById("correct-answer").value.trim();
-
-      if (!q || !o1 || !o2 || !o3 || !o4 || !correct) {
-        alert("Please fill all fields."); return;
+    // ✅ Hardcoded Quiz Data
+    const quizData = [
+      {
+        question: "What is the size of int in Java?",
+        options: ["2 bytes", "4 bytes", "8 bytes", "Depends on system"],
+        correct: "4 bytes"
+      },
+      {
+        question: "Which method is the entry point in a Java program?",
+        options: ["start()", "main()", "init()", "run()"],
+        correct: "main()"
+      },
+      {
+        question: "Which keyword is used to inherit a class in Java?",
+        options: ["this", "extends", "implements", "inherits"],
+        correct: "extends"
       }
+    ];
 
-      quizData.push({ question: q, options: [o1, o2, o3, o4], correct });
-      ["question-text","opt1","opt2","opt3","opt4","correct-answer"].forEach(id => document.getElementById(id).value = '');
-      document.getElementById("q-status").innerText = `${quizData.length} question(s) added.`;
-    }
-
-    /* ---------- Quiz Flow ---------- */
-    function startQuiz() {
-      if (quizData.length === 0) { alert("Add at least one question."); return; }
-      quizTitle = document.getElementById("quiz-title").value || "Untitled Quiz";
-      userAnswers = Array(quizData.length).fill(null);
-      current = 0;
-
-      document.getElementById("quizTitle").innerText = quizTitle;
-      document.getElementById("admin-section").classList.add("hidden");
-      document.getElementById("result-section").classList.add("hidden");
-      document.getElementById("quiz-section").classList.remove("hidden");
-      showQuestion();
-    }
+    let userAnswers = Array(quizData.length).fill(null);
+    let current = 0;
 
     function showQuestion() {
       const q = quizData[current];
       document.getElementById("question-box").innerHTML = `
-        <div class="question">Q${current+1}: ${q.question}</div>
+        <div class="question">Q${current+1}: ${q.question}</div>
         ${q.options.map(opt => `
-          <label><input type="radio" name="answer" value="${opt}"
-                 ${userAnswers[current]===opt ? "checked":""}> ${opt}</label><br>`).join('')}
+          <label><input type="radio" name="answer" value="${opt}" 
+            ${userAnswers[current] === opt ? "checked" : ""}> ${opt}</label><br>
+        `).join('')}
       `;
     }
 
@@ -114,67 +79,70 @@
       if (selected) userAnswers[current] = selected.value;
     }
 
-    function nextQuestion() { saveAnswer(); if (current < quizData.length-1) { current++; showQuestion(); } }
-    function prevQuestion() { saveAnswer(); if (current > 0) { current--; showQuestion(); } }
+    function nextQuestion() {
+      saveAnswer();
+      if (current < quizData.length - 1) {
+        current++;
+        showQuestion();
+      }
+    }
+
+    function prevQuestion() {
+      saveAnswer();
+      if (current > 0) {
+        current--;
+        showQuestion();
+      }
+    }
 
     function submitQuiz() {
       saveAnswer();
-      const score = quizData.reduce((s,q,i)=>s+(userAnswers[i]===q.correct),0);
+      let score = 0;
+      quizData.forEach((q, i) => {
+        if (userAnswers[i] === q.correct) score++;
+      });
 
       document.getElementById("quiz-section").classList.add("hidden");
       document.getElementById("result-section").classList.remove("hidden");
-      document.getElementById("scoreDisplay").innerText = `${score} / ${quizData.length}`;
+      document.getElementById("scoreDisplay").innerText = `${score} / ${quizData.length}`;
       window.finalScore = score;
-
-      document.getElementById("restartArea").innerHTML = '';
-      const restartBtn = document.createElement("button");
-      restartBtn.textContent = "Start Again for Next Student";
-      restartBtn.onclick = restartQuiz;
-      document.getElementById("restartArea").appendChild(restartBtn);
     }
 
-    function restartQuiz() {
-      userAnswers = Array(quizData.length).fill(null);
-      current = 0;
-      document.getElementById("userName").value = '';
-      document.getElementById("result-section").classList.add("hidden");
-      document.getElementById("quiz-section").classList.remove("hidden");
-      showQuestion();
-    }
-
-    /* ---------- Leaderboard ---------- */
     function saveScore() {
       const name = document.getElementById("userName").value.trim();
-      if (!name) { alert("Enter your name"); return; }
+      if (!name) return alert("Please enter your name.");
 
-      const board = JSON.parse(localStorage.getItem("quizLeaderboard") || "[]");
+      const board = JSON.parse(localStorage.getItem("leaderboard") || "[]");
       board.push({ name, score: window.finalScore });
-      board.sort((a,b)=>b.score-a.score);
-      localStorage.setItem("quizLeaderboard", JSON.stringify(board));
+      board.sort((a, b) => b.score - a.score);
+      localStorage.setItem("leaderboard", JSON.stringify(board));
       displayLeaderboard();
       alert("Score saved!");
     }
 
     function displayLeaderboard() {
-      const board = JSON.parse(localStorage.getItem("quizLeaderboard") || "[]");
-      document.getElementById("leaderboardList").innerHTML =
-        board.map(e=>`<li>${e.name} - ${e.score}</li>`).join('');
+      const board = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+      document.getElementById("leaderboardList").innerHTML = 
+        board.map(e => `<li>${e.name} - ${e.score}</li>`).join('');
     }
 
     function clearLeaderboard() {
-      if (!confirm("Clear all leaderboard records?")) return;
-      localStorage.removeItem("quizLeaderboard");
-      displayLeaderboard();
-      alert("Leaderboard cleared!");
+      if (confirm("Are you sure you want to clear the leaderboard?")) {
+        localStorage.removeItem("leaderboard");
+        displayLeaderboard();
+      }
     }
 
-    /* ---------- Share Link ---------- */
-    function copyLink() {
-      navigator.clipboard.writeText(location.href);
-      document.getElementById("shareStatus").innerText = "Link copied to clipboard!";
+    function restartQuiz() {
+      userAnswers = Array(quizData.length).fill(null);
+      current = 0;
+      document.getElementById("result-section").classList.add("hidden");
+      document.getElementById("quiz-section").classList.remove("hidden");
+      showQuestion();
     }
 
-    /* ---------- Init ---------- */
+    // Init
+    showQuestion();
     displayLeaderboard();
   </script>
 
