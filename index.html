@@ -63,6 +63,7 @@
       options: ["बंसी लाल", "भगवत दयाल शर्मा", "देवी लाल", "ओम प्रकाश चौटाला"],
       correct: "भगवत दयाल शर्मा"
     }
+     }
     ];
 
     let userAnswers = Array(quizData.length).fill(null);
@@ -106,7 +107,9 @@
       saveAnswer();
       let score = 0;
       quizData.forEach((q, i) => {
-        if (userAnswers[i] === q.correct) score++;
+        // if (userAnswers[i] === q.correct) score++;
+        if (userAnswers[i] === q[language].correct) score++;
+
       });
 
       document.getElementById("quiz-section").classList.add("hidden");
